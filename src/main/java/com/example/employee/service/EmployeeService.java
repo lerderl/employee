@@ -1,10 +1,10 @@
 package com.example.employee.service;
 
-import com.example.employee.entity.Employee;
 import jakarta.validation.Valid;
+import com.example.employee.entity.Employee;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.math.BigDecimal;
 
 public interface EmployeeService {
   Employee createEmployee(@Valid Employee employee);
