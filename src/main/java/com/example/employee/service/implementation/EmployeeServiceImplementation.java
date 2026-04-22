@@ -1,10 +1,13 @@
 package com.example.employee.service.implementation;
 
+import com.example.employee.dto.EmployeeRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.constraints.*;
 import com.example.employee.entity.Employee;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 import com.example.employee.service.EmployeeService;
 import com.example.employee.repository.EmployeeRepository;
 import org.springframework.validation.annotation.Validated;
@@ -59,11 +62,18 @@ public class EmployeeServiceImplementation implements EmployeeService {
   }
 
   @Override
-  public List<Employee> getAllEmployees() {
-    return employeeRepository.findAll();
+//  public List<Employee> getAllEmployees() {
+//    return employeeRepository.findAll();
+//  }
+  public Page<Employee> getAllEmployees(Pageable pageable, String department, Boolean active) {
+    Page<Employee> page = employeeRepository.findAll(pageable);
+
+    return (Page<Employee>) page.map(e -> e)
+        .filter(e -> department == null || e.getDepartment().equalsIgnoreCase(department))
+        .filter(e -> active == null || e.getActive().equals(active));
   }
 
-//  UPDATE
+//  FULL UPDATE
   @Override
   public Employee updateEmployee(Long id, @Valid Employee employee) {
     Employee existingEmployee = getEmployeeById(id);
@@ -82,6 +92,28 @@ public class EmployeeServiceImplementation implements EmployeeService {
     return employeeRepository.save(existingEmployee);
   }
 
+//  PARTIAL UPDATE
+  @Override
+  public Employee patchEmployee(Long id, EmployeeRequestDto dto) {
+    Employee existing = getEmployeeById(id);
+
+    if (dto.getSalary() != null) {
+      validateSalary(existing.getDepartment(), dto.getSalary());
+      existing.setSalary(dto.getSalary());
+    }
+
+    if (dto.getDepartment() != null) {
+      validateSalary(dto.getDepartment(), existing.getSalary());
+      existing.setDepartment(dto.getDepartment());
+    }
+
+    if (dto.getActive() != null) {
+      existing.setActive(dto.getActive());
+    }
+
+    return employeeRepository.save(existing);
+  }
+
 //  SOFT DELETE
   @Override
   public void softDeleteEmployee(Long id) {
@@ -92,13 +124,22 @@ public class EmployeeServiceImplementation implements EmployeeService {
 
 //  HARD DELETE (PURGE)
   @Override
-  public void purgeInactiveEmployees() {
-    List<Employee> inactive = employeeRepository.findAll()
-        .stream()
-        .filter(e -> Boolean.FALSE.equals(e.getActive()))
-        .toList();
+//  public void purgeInactiveEmployees() {
+//    List<Employee> inactive = employeeRepository.findAll()
+//        .stream()
+//        .filter(e -> Boolean.FALSE.equals(e.getActive()))
+//        .toList();
+//
+//    employeeRepository.deleteAll(inactive);
+//  }
+  public void hardDeleteIfInactive(Long id) {
+    Employee employee = getEmployeeById(id);
 
-    employeeRepository.deleteAll(inactive);
+    if (Boolean.TRUE.equals(employee.getActive())) {
+      throw new IllegalStateException("Cannot hard delete active employee");
+    }
+
+    employeeRepository.delete(employee);
   }
 
 //  CUSTOM QUERIES
@@ -113,7 +154,7 @@ public class EmployeeServiceImplementation implements EmployeeService {
   }
 
   @Override
-  public List<Employee> getEmployeeBySalaryRange(BigDecimal min, BigDecimal max) {
+  public List<Employee> getEmployeesBySalaryRange(BigDecimal min, BigDecimal max) {
     return employeeRepository.findBySalaryRange(min, max);
   }
 }
