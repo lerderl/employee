@@ -1,13 +1,16 @@
 package com.example.employee.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.math.BigDecimal;
 
-@Getter @Setter
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class EmployeeRequestDto {
   @NotBlank
   @Size(max = 50)
