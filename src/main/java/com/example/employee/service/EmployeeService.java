@@ -14,11 +14,9 @@ public interface EmployeeService {
   Employee updateEmployee(Long id, @Valid Employee employee);
   Employee patchEmployee(Long id, EmployeeRequestDto dto);
   Employee getEmployeeById(Long id);
-//  List<Employee> getAllEmployees();
   Page<Employee> getAllEmployees(Pageable pageable, String department, Boolean active);
   void softDeleteEmployee(Long id);
   void hardDeleteIfInactive(Long id);
-//  void purgeInactiveEmployees();
   List<Employee> getEmployeesByDepartment(String department);
   List<Employee> getActiveEmployees();
   List<Employee> getEmployeesBySalaryRange(BigDecimal min, BigDecimal max);
