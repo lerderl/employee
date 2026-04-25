@@ -1,6 +1,5 @@
 package com.example.employee.service.implementation;
 
-import com.example.employee.dto.EmployeeRequestDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.constraints.*;
@@ -8,6 +7,7 @@ import com.example.employee.entity.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import com.example.employee.dto.EmployeeRequestDto;
 import com.example.employee.service.EmployeeService;
 import com.example.employee.repository.EmployeeRepository;
 import org.springframework.validation.annotation.Validated;
@@ -62,15 +62,10 @@ public class EmployeeServiceImplementation implements EmployeeService {
   }
 
   @Override
-//  public List<Employee> getAllEmployees() {
-//    return employeeRepository.findAll();
-//  }
   public Page<Employee> getAllEmployees(Pageable pageable, String department, Boolean active) {
     Page<Employee> page = employeeRepository.findAll(pageable);
 
-    return (Page<Employee>) page.map(e -> e)
-        .filter(e -> department == null || e.getDepartment().equalsIgnoreCase(department))
-        .filter(e -> active == null || e.getActive().equals(active));
+    return page.map(employee -> employee);
   }
 
 //  FULL UPDATE
@@ -124,14 +119,6 @@ public class EmployeeServiceImplementation implements EmployeeService {
 
 //  HARD DELETE (PURGE)
   @Override
-//  public void purgeInactiveEmployees() {
-//    List<Employee> inactive = employeeRepository.findAll()
-//        .stream()
-//        .filter(e -> Boolean.FALSE.equals(e.getActive()))
-//        .toList();
-//
-//    employeeRepository.deleteAll(inactive);
-//  }
   public void hardDeleteIfInactive(Long id) {
     Employee employee = getEmployeeById(id);
 
