@@ -1,10 +1,12 @@
 package com.example.employee.controller;
 
 import com.example.employee.entity.Employee;
+import com.example.employee.dto.ImportResultDto;
 import com.example.employee.mapper.EmployeeMapper;
 import com.example.employee.dto.EmployeeRequestDto;
 import com.example.employee.dto.EmployeeResponseDto;
 import com.example.employee.service.EmployeeService;
+import com.example.employee.service.EmployeeImportService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeController {
   private final EmployeeService employeeService;
+  private final EmployeeImportService employeeImportService;
 
 //  Create endpoint
   @PostMapping
@@ -41,7 +45,6 @@ public class EmployeeController {
     @RequestParam(required = false) String department,
     @RequestParam(required = false) Boolean active
   ) {
-
     Sort.Direction direction = sort[1].equalsIgnoreCase("desc")
         ? Sort.Direction.DESC : Sort.Direction.ASC;
 
@@ -63,7 +66,6 @@ public class EmployeeController {
   public EmployeeResponseDto update(
       @PathVariable Long id,
       @Valid @RequestBody EmployeeRequestDto dto) {
-
     Employee updated = employeeService.updateEmployee(id, EmployeeMapper.toEntity(dto));
     return EmployeeMapper.toDto(updated);
   }
@@ -73,7 +75,6 @@ public class EmployeeController {
   public EmployeeResponseDto patch(
       @PathVariable Long id,
       @RequestBody EmployeeRequestDto dto) {
-
     Employee updated = employeeService.patchEmployee(id, dto);
     return EmployeeMapper.toDto(updated);
   }
@@ -97,10 +98,15 @@ public class EmployeeController {
   public List<EmployeeResponseDto> salaryRange(
       @RequestParam BigDecimal min,
       @RequestParam BigDecimal max) {
-
     return employeeService.getEmployeesBySalaryRange(min, max)
         .stream()
         .map(EmployeeMapper::toDto)
         .toList();
+  }
+
+//  Excel import
+  @PostMapping(value = "/import", consumes = "multipart/form-data")
+  public ImportResultDto importEmployees(@RequestParam("file") MultipartFile file) {
+    return employeeImportService.importEmployees(file);
   }
 }
