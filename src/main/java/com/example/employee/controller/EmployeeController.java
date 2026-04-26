@@ -6,6 +6,7 @@ import com.example.employee.mapper.EmployeeMapper;
 import com.example.employee.dto.EmployeeRequestDto;
 import com.example.employee.dto.EmployeeResponseDto;
 import com.example.employee.service.EmployeeService;
+import com.example.employee.service.EmployeeExportService;
 import com.example.employee.service.EmployeeImportService;
 
 import jakarta.validation.Valid;
@@ -13,13 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -27,6 +29,7 @@ import java.util.List;
 public class EmployeeController {
   private final EmployeeService employeeService;
   private final EmployeeImportService employeeImportService;
+  private final EmployeeExportService employeeExportService;
 
 //  Create endpoint
   @PostMapping
@@ -108,5 +111,15 @@ public class EmployeeController {
   @PostMapping(value = "/import", consumes = "multipart/form-data")
   public ImportResultDto importEmployees(@RequestParam("file") MultipartFile file) {
     return employeeImportService.importEmployees(file);
+  }
+
+//  Excel export
+  @GetMapping("/export/excel")
+  public void exportEmployeesToExcel(
+      @RequestParam(required = false) String department,
+      @RequestParam(required = false) Boolean active,
+      HttpServletResponse response) {
+
+    employeeExportService.exportToExcel(department, active, response);
   }
 }
