@@ -1,31 +1,31 @@
 package com.example.employee.service.implementation;
 
-import com.example.employee.dto.EmployeeRequestDto;
-import com.example.employee.dto.ImportResultDto;
-import com.example.employee.entity.Employee;
-import com.example.employee.exception.ExcelProcessingException;
-import com.example.employee.mapper.EmployeeMapper;
-import com.example.employee.service.EmployeeImportService;
-import com.example.employee.service.EmployeeService;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
+import com.example.employee.entity.Employee;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import jakarta.validation.ConstraintViolation;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.example.employee.dto.ImportResultDto;
+import com.example.employee.mapper.EmployeeMapper;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.example.employee.dto.EmployeeRequestDto;
+import com.example.employee.service.EmployeeService;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.employee.service.EmployeeImportService;
+import com.example.employee.exception.ExcelProcessingException;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -111,16 +111,31 @@ public class EmployeeImportServiceImpl implements EmployeeImportService {
 
   private BigDecimal getBigDecimal(Cell cell) {
     if (cell == null) return null;
-    return BigDecimal.valueOf(cell.getNumericCellValue());
+//    return BigDecimal.valueOf(cell.getNumericCellValue());
+    return switch(cell.getCellType()) {
+      case NUMERIC ->  BigDecimal.valueOf(cell.getNumericCellValue());
+      case STRING -> new  BigDecimal(cell.getStringCellValue().trim());
+      default -> throw new IllegalArgumentException("Invalid cell type: " + cell.getCellType() + " salary format");
+    };
   }
 
   private LocalDate getLocalDate(Cell cell) {
     if (cell == null) return null;
-    return cell.getLocalDateTimeCellValue().toLocalDate();
+//    return cell.getLocalDateTimeCellValue().toLocalDate();
+    return switch(cell.getCellType()) {
+      case NUMERIC ->  cell.getLocalDateTimeCellValue().toLocalDate();
+      case STRING -> LocalDate.parse(cell.getStringCellValue().trim());
+      default -> throw new IllegalArgumentException("Invalid cell type: " + cell.getCellType() + " date format");
+    };
   }
 
   private Boolean getBoolean(Cell cell) {
     if (cell == null) return null;
-    return cell.getBooleanCellValue();
+//    return cell.getBooleanCellValue();
+    return switch(cell.getCellType()) {
+      case BOOLEAN ->  cell.getBooleanCellValue();
+      case STRING -> Boolean.parseBoolean(cell.getStringCellValue().trim());
+      default -> throw new IllegalArgumentException("Invalid cell type: " + cell.getCellType() + " boolean format");
+    };
   }
 }
