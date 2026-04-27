@@ -6,15 +6,18 @@ import com.example.employee.mapper.EmployeeMapper;
 import com.example.employee.dto.EmployeeRequestDto;
 import com.example.employee.dto.EmployeeResponseDto;
 import com.example.employee.service.EmployeeService;
+import com.example.employee.service.EmployeePdfService;
 import com.example.employee.service.EmployeeExportService;
 import com.example.employee.service.EmployeeImportService;
 
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +31,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class EmployeeController {
   private final EmployeeService employeeService;
+  private final EmployeePdfService employeePdfService;
   private final EmployeeImportService employeeImportService;
   private final EmployeeExportService employeeExportService;
 
@@ -121,5 +125,11 @@ public class EmployeeController {
       HttpServletResponse response) {
 
     employeeExportService.exportToExcel(department, active, response);
+  }
+
+//  Pdf report generation
+  @GetMapping("/export/pdf")
+  public void exportEmployeesToPdf(HttpServletResponse response) {
+    employeePdfService.exportToPdf(response);
   }
 }
