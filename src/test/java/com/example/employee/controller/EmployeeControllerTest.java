@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -152,11 +153,13 @@ public class EmployeeControllerTest {
     Mockito.when(importService.importEmployees(Mockito.any()))
         .thenReturn(result);
 
+    ClassPathResource resource = new ClassPathResource("employees_template.xlsx");
+
     MockMultipartFile file = new MockMultipartFile(
         "file",
-        "employees.xlsx",
+        "employees_template.xlsx",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "dummy".getBytes()
+        resource.getInputStream()
     );
 
     mockMvc.perform(multipart("/api/v1/employees/import")
