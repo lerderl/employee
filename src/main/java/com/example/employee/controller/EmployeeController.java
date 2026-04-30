@@ -1,14 +1,11 @@
 package com.example.employee.controller;
 
+import com.example.employee.service.*;
 import com.example.employee.entity.Employee;
 import com.example.employee.dto.ImportResultDto;
 import com.example.employee.mapper.EmployeeMapper;
 import com.example.employee.dto.EmployeeRequestDto;
 import com.example.employee.dto.EmployeeResponseDto;
-import com.example.employee.service.EmployeeService;
-import com.example.employee.service.EmployeePdfService;
-import com.example.employee.service.EmployeeExportService;
-import com.example.employee.service.EmployeeImportService;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +28,7 @@ import java.math.BigDecimal;
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
 public class EmployeeController {
+  private final EmailService emailService;
   private final EmployeeService employeeService;
   private final EmployeePdfService employeePdfService;
   private final EmployeeImportService employeeImportService;
@@ -131,5 +130,20 @@ public class EmployeeController {
   @GetMapping("/export/pdf")
   public void exportEmployeesToPdf(HttpServletResponse response) {
     employeePdfService.exportToPdf(response);
+  }
+
+//  Send files to mail
+  @PostMapping("/export/email")
+  public ResponseEntity<String> sendReportsByEmail(
+      @RequestParam String email,
+      @RequestParam(required = false) String department,
+      @RequestParam(required = false) Boolean active) {
+
+    byte[] excel = employeeExportService.sendExcelToMail(department, active);
+    byte[] pdf = employeePdfService.sendPdfToMail();
+
+    emailService.sendEmployeeReport(email, excel, pdf);
+
+    return ResponseEntity.ok("Email sent successfully");
   }
 }
