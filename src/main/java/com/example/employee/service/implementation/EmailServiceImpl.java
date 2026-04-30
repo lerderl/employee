@@ -35,6 +35,7 @@ public class EmailServiceImpl implements EmailService {
       mailSender.send(message);
 
     } catch (Exception e) {
+      e.printStackTrace();
       throw new RuntimeException("Email sending failed", e);
     }
   }
