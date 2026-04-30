@@ -16,4 +16,5 @@ public interface EmployeePdfService {
    * @param response the HTTP response used to stream the generated PDF file
    */
   void exportToPdf(HttpServletResponse response);
+  byte[] sendPdfToMail();
 }

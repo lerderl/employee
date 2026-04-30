@@ -14,6 +14,7 @@ import java.util.List;
 import java.io.OutputStream;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -128,6 +129,22 @@ public class EmployeeExportServiceImpl implements EmployeeExportService {
       os.flush();
     } catch (Exception e) {
       throw new RuntimeException("Excel export failed: " + e.getMessage());
+    }
+  }
+
+  @Override
+  public byte[] sendExcelToMail(String department, Boolean active) {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+         Workbook workbook = new XSSFWorkbook()) {
+
+      Sheet sheet = workbook.createSheet("Employees");
+
+//      build sheet
+      workbook.write(out);
+      return out.toByteArray();
+
+    } catch (Exception e) {
+      throw new RuntimeException("Excel generation failed", e);
     }
   }
 

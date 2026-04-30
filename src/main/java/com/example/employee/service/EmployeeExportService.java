@@ -19,4 +19,5 @@ public interface EmployeeExportService {
    * @param response the HTTP response used to stream the generated Excel file
    */
   void exportToExcel(String department, Boolean active, HttpServletResponse response);
+  byte[] sendExcelToMail(String department, Boolean active);
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.io.OutputStream;
 import java.text.NumberFormat;
+import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -132,6 +133,24 @@ public class EmployeePdfServiceImpl implements EmployeePdfService {
       document.close();
     } catch (Exception e) {
       throw new RuntimeException("PDF generation failed: " + e.getMessage());
+    }
+  }
+
+  @Override
+  public byte[] sendPdfToMail() {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+      Document document = new Document();
+      PdfWriter.getInstance(document, out);
+
+      document.open();
+      document.add(new Paragraph("Employee Report"));
+      document.close();
+
+      return out.toByteArray();
+
+    } catch (Exception e) {
+      throw new RuntimeException("PDF generation failed", e);
     }
   }
 
