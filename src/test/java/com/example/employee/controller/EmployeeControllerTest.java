@@ -31,10 +31,11 @@ public class EmployeeControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
+  @MockitoBean private EmailService emailService;
+  @MockitoBean private EmployeePdfService pdfService;
   @MockitoBean  private EmployeeService employeeService;
   @MockitoBean private EmployeeImportService importService;
   @MockitoBean private EmployeeExportService exportService;
-  @MockitoBean private EmployeePdfService pdfService;
 
 //  @Autowired
   private final ObjectMapper objectMapper = new ObjectMapper()
@@ -202,6 +203,27 @@ public class EmployeeControllerTest {
         .andExpect(header().string("Content-Type", "application/pdf"))
         .andExpect(header().string("Content-Disposition",
             org.hamcrest.Matchers.containsString("attachment")));
+  }
+
+//  ---------------- SEND EMAIL ----------------
+  @Test
+  void sendEmail_shouldReturn200() throws Exception {
+    byte[] excelBytes = "excel".getBytes();
+    byte[] pdfBytes = "pdf".getBytes();
+
+    Mockito.when(exportService.sendExcelToMail(null, null)).thenReturn(excelBytes);
+    Mockito.when(pdfService.sendPdfToMail()).thenReturn(pdfBytes);
+
+    mockMvc.perform(post("/api/v1/employees/export/email")
+            .param("email", "test@gmail.com"))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Email sent successfully"));
+
+    Mockito.verify(emailService).sendEmployeeReport(
+        Mockito.eq("test@gmail.com"),
+        Mockito.eq(excelBytes),
+        Mockito.eq(pdfBytes)
+    );
   }
 
   // ---------------- HELPER ----------------
