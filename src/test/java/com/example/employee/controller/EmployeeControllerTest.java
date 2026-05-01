@@ -226,6 +226,20 @@ public class EmployeeControllerTest {
     );
   }
 
+  @Test
+  void sendEmail_shouldReturn500_whenEmailFails() throws Exception {
+    Mockito.when(exportService.sendExcelToMail(null, null)).thenReturn(new byte[]{1});
+    Mockito.when(pdfService.sendPdfToMail()).thenReturn(new byte[]{1});
+
+    Mockito.doThrow(new RuntimeException("Email sending failed"))
+        .when(emailService)
+        .sendEmployeeReport(Mockito.any(), Mockito.any(), Mockito.any());
+
+    mockMvc.perform(post("/api/v1/employees/export/email")
+            .param("email", "test@gmail.com"))
+        .andExpect(status().isInternalServerError());
+  }
+
   // ---------------- HELPER ----------------
   private Employee buildEmployee() {
     Employee e = new Employee();
