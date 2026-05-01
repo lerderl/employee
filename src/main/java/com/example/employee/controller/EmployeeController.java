@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
@@ -20,10 +22,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.math.BigDecimal;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
@@ -122,7 +126,6 @@ public class EmployeeController {
       @RequestParam(required = false) String department,
       @RequestParam(required = false) Boolean active,
       HttpServletResponse response) {
-
     employeeExportService.exportToExcel(department, active, response);
   }
 
@@ -135,6 +138,8 @@ public class EmployeeController {
 //  Send files to mail
   @PostMapping("/export/email")
   public ResponseEntity<String> sendReportsByEmail(
+      @NotBlank(message = "Email is required")
+      @Email(message = "Invalid email format")
       @RequestParam String email,
       @RequestParam(required = false) String department,
       @RequestParam(required = false) Boolean active) {

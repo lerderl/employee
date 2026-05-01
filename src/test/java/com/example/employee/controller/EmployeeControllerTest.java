@@ -240,6 +240,13 @@ public class EmployeeControllerTest {
         .andExpect(status().isInternalServerError());
   }
 
+  @Test
+  void sendEmail_shouldReturn400_whenInvalidEmail() throws Exception {
+    mockMvc.perform(post("/api/v1/employees/export/email")
+            .param("email", "invalid-email"))
+        .andExpect(status().isBadRequest());
+  }
+
   // ---------------- HELPER ----------------
   private Employee buildEmployee() {
     Employee e = new Employee();
