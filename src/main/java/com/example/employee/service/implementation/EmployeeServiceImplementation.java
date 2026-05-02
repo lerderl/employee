@@ -26,7 +26,7 @@ public class EmployeeServiceImplementation implements EmployeeService {
 //  Duplicate email check
   private void validateDuplicateEmail(String email, Long currentId) {
     employeeRepository.findByEmail(email).ifPresent(employee -> {
-      if (currentId == null || !employee.getId().equals(currentId)) {
+      if (!employee.getId().equals(currentId)) {
         throw new DuplicateEmailException(email);
       }
     });

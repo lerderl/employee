@@ -1,5 +1,6 @@
 package com.example.employee;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,6 +9,11 @@ public class EmployeeApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(EmployeeApplication.class, args);
+
+    Dotenv dotenv = Dotenv.load();
+
+    System.setProperty("MAIL_USERNAME",  dotenv.get("MAIL_USERNAME"));
+    System.setProperty("MAIL_PASSWORD",  dotenv.get("MAIL_PASSWORD"));
   }
 
 }
