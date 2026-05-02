@@ -32,18 +32,52 @@ public class EmployeePdfServiceImpl implements EmployeePdfService {
   @Override
   public void exportToPdf(HttpServletResponse response) {
     try {
-      List<Employee> employees = employeeRepository.findAll();
-
       String timestamp = java.time.LocalDateTime.now()
           .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
       response.setContentType("application/pdf");
       response.setHeader("Content-Disposition", "attachment; filename=employee_report_" + timestamp + ".pdf");
 
-      OutputStream os = response.getOutputStream();
+      byte[] pdfBytes = generateEmployeePdf();
+
+      try (OutputStream os = response.getOutputStream()) {
+        os.write(pdfBytes);
+        os.flush();
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("PDF generation failed: " + e.getMessage());
+    }
+  }
+
+  @Override
+  public byte[] sendPdfToMail() {
+    return generateEmployeePdf();
+  }
+
+//  ---------------- HELPERS ----------------
+
+  private void addHeaderCell(PdfPTable table, String text, Font font) {
+    PdfPCell cell = new PdfPCell(new Phrase(text, font));
+    cell.setBackgroundColor(new Color(0, 102, 204));
+    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+    cell.setPadding(5);
+    table.addCell(cell);
+  }
+
+  private void addCell(PdfPTable table, Object value, Font font, Color bg, int align) {
+    PdfPCell cell = new PdfPCell(new Phrase(value != null ? value.toString() : "", font));
+    cell.setBackgroundColor(bg);
+    cell.setHorizontalAlignment(align);
+    cell.setPadding(5);
+    table.addCell(cell);
+  }
+
+  private byte[] generateEmployeePdf() {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()){
+      List<Employee> employees = employeeRepository.findAll();
 
       Document document = new Document(PageSize.A4, 36, 36, 54, 54);
-      PdfWriter writer = PdfWriter.getInstance(document, os);
+      PdfWriter writer = PdfWriter.getInstance(document, out);
 
 //      Footer handler
       writer.setPageEvent(new FooterPageEvent());
@@ -131,44 +165,9 @@ public class EmployeePdfServiceImpl implements EmployeePdfService {
       document.add(table);
 
       document.close();
+      return out.toByteArray();
     } catch (Exception e) {
       throw new RuntimeException("PDF generation failed: " + e.getMessage());
     }
-  }
-
-  @Override
-  public byte[] sendPdfToMail() {
-    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
-      Document document = new Document();
-      PdfWriter.getInstance(document, out);
-
-      document.open();
-      document.add(new Paragraph("Employee Report"));
-      document.close();
-
-      return out.toByteArray();
-
-    } catch (Exception e) {
-      throw new RuntimeException("PDF generation failed", e);
-    }
-  }
-
-//  ---------------- HELPERS ----------------
-
-  private void addHeaderCell(PdfPTable table, String text, Font font) {
-    PdfPCell cell = new PdfPCell(new Phrase(text, font));
-    cell.setBackgroundColor(new Color(0, 102, 204));
-    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-    cell.setPadding(5);
-    table.addCell(cell);
-  }
-
-  private void addCell(PdfPTable table, Object value, Font font, Color bg, int align) {
-    PdfPCell cell = new PdfPCell(new Phrase(value != null ? value.toString() : "", font));
-    cell.setBackgroundColor(bg);
-    cell.setHorizontalAlignment(align);
-    cell.setPadding(5);
-    table.addCell(cell);
   }
 }
