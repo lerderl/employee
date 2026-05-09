@@ -1,8 +1,8 @@
 package com.example.employee.mapper;
 
 import com.example.employee.entity.Employee;
-import com.example.employee.dto.EmployeeRequestDto;
-import com.example.employee.dto.EmployeeResponseDto;
+import com.example.employee.dto.request.EmployeeRequestDto;
+import com.example.employee.dto.response.EmployeeResponseDto;
 
 public class EmployeeMapper {
   public static Employee toEntity(EmployeeRequestDto dto) {

@@ -1,4 +1,4 @@
-package com.example.employee.dto;
+package com.example.employee.dto.request;
 
 import lombok.*;
 import jakarta.validation.constraints.*;

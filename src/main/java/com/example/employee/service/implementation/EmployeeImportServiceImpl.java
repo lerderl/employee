@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.example.employee.dto.ImportResultDto;
 import com.example.employee.mapper.EmployeeMapper;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import com.example.employee.dto.EmployeeRequestDto;
+import com.example.employee.dto.request.EmployeeRequestDto;
 import com.example.employee.service.EmployeeService;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.employee.service.EmployeeImportService;

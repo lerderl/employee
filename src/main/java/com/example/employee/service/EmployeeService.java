@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import com.example.employee.entity.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.employee.dto.EmployeeRequestDto;
+import com.example.employee.dto.request.EmployeeRequestDto;
 
 import java.util.List;
 import java.math.BigDecimal;

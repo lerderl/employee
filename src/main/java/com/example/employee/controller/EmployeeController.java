@@ -4,8 +4,8 @@ import com.example.employee.service.*;
 import com.example.employee.entity.Employee;
 import com.example.employee.dto.ImportResultDto;
 import com.example.employee.mapper.EmployeeMapper;
-import com.example.employee.dto.EmployeeRequestDto;
-import com.example.employee.dto.EmployeeResponseDto;
+import com.example.employee.dto.request.EmployeeRequestDto;
+import com.example.employee.dto.response.EmployeeResponseDto;
 
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;

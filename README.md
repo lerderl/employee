@@ -43,15 +43,13 @@ cd employee
 
 ### 2. Configure database
 
-#### Option A: H2 (default)
+#### H2 (default)
 
 No setup required. Access console:
 
 ```
 http://localhost:8080/h2-console
 ```
-
-#### Option B: MySQL
 
 Update `application.properties`:
 
